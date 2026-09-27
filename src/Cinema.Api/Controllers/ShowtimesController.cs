@@ -35,4 +35,13 @@ public sealed class ShowtimesController(IShowtimeService showtimeService) : Cont
         var showtime = await showtimeService.GetByIdAsync(id, cancellationToken);
         return Ok(showtime);
     }
+
+    [HttpGet("{id:guid}/seats")]
+    [ProducesResponseType<IReadOnlyList<SeatAvailabilityResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<SeatAvailabilityResponse>>> GetSeats(Guid id, CancellationToken cancellationToken)
+    {
+        var seats = await showtimeService.GetSeatsAsync(id, cancellationToken);
+        return Ok(seats);
+    }
 }

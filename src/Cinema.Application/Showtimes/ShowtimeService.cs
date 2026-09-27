@@ -1,12 +1,17 @@
 using Cinema.Application.Abstractions;
+using Cinema.Application.Common;
 using Cinema.Domain.Entities;
+using Cinema.Domain.Enums;
 using Cinema.Domain.Exceptions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Application.Showtimes;
 
-public sealed class ShowtimeService(IAppDbContext dbContext, IValidator<CreateShowtimeRequest> validator) : IShowtimeService
+public sealed class ShowtimeService(
+    IAppDbContext dbContext,
+    IValidator<CreateShowtimeRequest> validator,
+    TimeProvider timeProvider) : IShowtimeService
 {
     public async Task<ShowtimeResponse> CreateAsync(CreateShowtimeRequest request, CancellationToken cancellationToken = default)
     {
@@ -60,6 +65,41 @@ public sealed class ShowtimeService(IAppDbContext dbContext, IValidator<CreateSh
 
         return ToResponse(row.Showtime, row.MovieTitle, row.DurationMinutes, row.AuditoriumName);
     }
+
+    public async Task<IReadOnlyList<SeatAvailabilityResponse>> GetSeatsAsync(Guid showtimeId, CancellationToken cancellationToken = default)
+    {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+
+        var exists = await dbContext.Showtimes
+            .AsNoTracking()
+            .AnyAsync(s => s.Id == showtimeId, cancellationToken);
+
+        if (!exists)
+        {
+            throw new NotFoundException(nameof(Showtime), showtimeId);
+        }
+
+        var seats = await dbContext.ShowtimeSeats
+            .AsNoTracking()
+            .Where(ss => ss.ShowtimeId == showtimeId)
+            .WithPosition(dbContext)
+            .OrderBy(x => x.Row).ThenBy(x => x.Number)
+            .ToListAsync(cancellationToken);
+
+        var holders = await dbContext.LoadHoldersAsync(seats.Select(x => x.ShowtimeSeat), cancellationToken);
+
+        return seats
+            .Select(x => new SeatAvailabilityResponse(
+                x.ShowtimeSeat.SeatId,
+                x.Row,
+                x.Number,
+                EffectiveStatus(x.ShowtimeSeat, holders.HolderOf(x.ShowtimeSeat), now)))
+            .ToList();
+    }
+
+    /// <summary>Reports a seat as Free when it can be reserved now, which covers reserved seats whose hold has expired.</summary>
+    private static SeatStatus EffectiveStatus(ShowtimeSeat seat, Reservation? holder, DateTime now) =>
+        seat.IsAvailable(holder, now) ? SeatStatus.Free : seat.Status;
 
     /// <summary>
     /// Rejects the new interval [start, end) if any showtime in the same auditorium overlaps it.

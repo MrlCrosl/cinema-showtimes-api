@@ -88,3 +88,95 @@ GET {{host}}/api/showtimes/{{createShowtime.response.body.$.id}}
 
 ### Showtimes: unknown id (404)
 GET {{host}}/api/showtimes/00000000-0000-0000-0000-00000000dead
+
+###############################################################################
+# Reservations flow
+###############################################################################
+
+### Reservations: create a showtime to reserve seats for (201)
+# @name reservationShowtime
+POST {{host}}/api/showtimes
+Content-Type: application/json
+
+{
+  "movieId": "{{godfather}}",
+  "auditoriumId": "{{hall1}}",
+  "startTime": "2030-02-01T20:00:00Z"
+}
+
+### Reservations: seat map for the showtime (200, all Free)
+# @name getSeats
+GET {{host}}/api/showtimes/{{reservationShowtime.response.body.$.id}}/seats
+
+### Reservations: reserve two seats (201)
+# @name reserve
+POST {{host}}/api/reservations
+Content-Type: application/json
+
+{
+  "showtimeId": "{{reservationShowtime.response.body.$.id}}",
+  "seatIds": [
+    "{{getSeats.response.body.$[0].seatId}}",
+    "{{getSeats.response.body.$[1].seatId}}"
+  ]
+}
+
+### Reservations: reserve one of them again while held (409)
+POST {{host}}/api/reservations
+Content-Type: application/json
+
+{
+  "showtimeId": "{{reservationShowtime.response.body.$.id}}",
+  "seatIds": [ "{{getSeats.response.body.$[0].seatId}}" ]
+}
+
+### Reservations: seat map shows the two seats Reserved (200)
+GET {{host}}/api/showtimes/{{reservationShowtime.response.body.$.id}}/seats
+
+### Reservations: get by reference (200, state Pending)
+GET {{host}}/api/reservations/{{reserve.response.body.$.reference}}
+
+### Reservations: confirm (200, state Confirmed)
+POST {{host}}/api/reservations/{{reserve.response.body.$.reference}}/confirm
+
+### Reservations: confirm again (409)
+POST {{host}}/api/reservations/{{reserve.response.body.$.reference}}/confirm
+
+### Reservations: seat map shows the two seats Sold (200)
+GET {{host}}/api/showtimes/{{reservationShowtime.response.body.$.id}}/seats
+
+### Reservations: reserve a sold seat (409)
+POST {{host}}/api/reservations
+Content-Type: application/json
+
+{
+  "showtimeId": "{{reservationShowtime.response.body.$.id}}",
+  "seatIds": [ "{{getSeats.response.body.$[1].seatId}}" ]
+}
+
+### Reservations: duplicate seat ids (400)
+POST {{host}}/api/reservations
+Content-Type: application/json
+
+{
+  "showtimeId": "{{reservationShowtime.response.body.$.id}}",
+  "seatIds": [
+    "{{getSeats.response.body.$[2].seatId}}",
+    "{{getSeats.response.body.$[2].seatId}}"
+  ]
+}
+
+### Reservations: unknown seat id for this showtime (400)
+POST {{host}}/api/reservations
+Content-Type: application/json
+
+{
+  "showtimeId": "{{reservationShowtime.response.body.$.id}}",
+  "seatIds": [ "00000000-0000-0000-0000-00000000dead" ]
+}
+
+### Reservations: unknown reservation (404)
+GET {{host}}/api/reservations/00000000-0000-0000-0000-00000000dead
+
+### Showtimes: seats of an unknown showtime (404)
+GET {{host}}/api/showtimes/00000000-0000-0000-0000-00000000dead/seats

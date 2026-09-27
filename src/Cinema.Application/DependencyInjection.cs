@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Cinema.Application.Movies;
+using Cinema.Application.Reservations;
 using Cinema.Application.Showtimes;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ public static class DependencyInjection
 
         services.AddScoped<IMovieService, MovieService>();
         services.AddScoped<IShowtimeService, ShowtimeService>();
+        services.AddScoped<IReservationService, ReservationService>();
 
         return services;
     }

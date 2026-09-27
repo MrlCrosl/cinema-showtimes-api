@@ -10,4 +10,8 @@ public interface IShowtimeService
 
     /// <exception cref="Cinema.Domain.Exceptions.NotFoundException">The showtime does not exist.</exception>
     Task<ShowtimeResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>All seats of the showtime's auditorium with their current availability, ordered by row and number.</summary>
+    /// <exception cref="Cinema.Domain.Exceptions.NotFoundException">The showtime does not exist.</exception>
+    Task<IReadOnlyList<SeatAvailabilityResponse>> GetSeatsAsync(Guid showtimeId, CancellationToken cancellationToken = default);
 }
