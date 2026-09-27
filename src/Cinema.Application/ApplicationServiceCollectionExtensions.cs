@@ -4,11 +4,10 @@ using Cinema.Application.Movies;
 using Cinema.Application.Reservations;
 using Cinema.Application.Showtimes;
 using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Cinema.Application;
+namespace Microsoft.Extensions.DependencyInjection;
 
-public static class DependencyInjection
+public static class ApplicationServiceCollectionExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
@@ -20,7 +19,7 @@ public static class DependencyInjection
         ValidatorOptions.Global.DisplayNameResolver = (_, member, _) =>
             member is null ? null : SplitPascalCase(member.Name);
 
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddValidatorsFromAssembly(typeof(ApplicationServiceCollectionExtensions).Assembly);
 
         services.AddScoped<IMovieService, MovieService>();
         services.AddScoped<IShowtimeService, ShowtimeService>();

@@ -1,11 +1,10 @@
 using Cinema.Application.Abstractions;
 using Cinema.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Cinema.Infrastructure;
+namespace Microsoft.Extensions.DependencyInjection;
 
-public static class DependencyInjection
+public static class InfrastructureServiceCollectionExtensions
 {
     /// <param name="services">The service collection to register infrastructure services in.</param>
     /// <param name="connectionString">

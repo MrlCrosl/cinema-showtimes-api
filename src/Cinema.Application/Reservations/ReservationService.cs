@@ -154,15 +154,13 @@ public sealed class ReservationService(
             .Where(r => r.Id == reference)
             .Join(dbContext.Showtimes, r => r.ShowtimeId, s => s.Id, (r, s) => new { Reservation = r, Showtime = s })
             .Join(dbContext.Movies, x => x.Showtime.MovieId, m => m.Id, (x, m) => new { x.Reservation, x.Showtime, Movie = m })
-            .Join(dbContext.Auditoriums, x => x.Showtime.AuditoriumId, a => a.Id, (x, a) => new ReservationRow
-            {
-                Reservation = x.Reservation,
-                StartTime = x.Showtime.StartTime,
-                MovieId = x.Movie.Id,
-                MovieTitle = x.Movie.Title,
-                AuditoriumId = a.Id,
-                AuditoriumName = a.Name
-            })
+            .Join(dbContext.Auditoriums, x => x.Showtime.AuditoriumId, a => a.Id, (x, a) => new ReservationRow(
+                x.Reservation,
+                x.Showtime.StartTime,
+                x.Movie.Id,
+                x.Movie.Title,
+                a.Id,
+                a.Name))
             .SingleOrDefaultAsync(cancellationToken)
             ?? throw new NotFoundException(nameof(Reservation), reference);
 
@@ -211,18 +209,12 @@ public sealed class ReservationService(
         }
     }
 
-    private sealed class ReservationRow
-    {
-        public required Reservation Reservation { get; init; }
-
-        public required DateTime StartTime { get; init; }
-
-        public required Guid MovieId { get; init; }
-
-        public required string MovieTitle { get; init; }
-
-        public required Guid AuditoriumId { get; init; }
-
-        public required string AuditoriumName { get; init; }
-    }
+    // Single-use projection for this query; shared projections live in Common.
+    private sealed record ReservationRow(
+        Reservation Reservation,
+        DateTime StartTime,
+        Guid MovieId,
+        string MovieTitle,
+        Guid AuditoriumId,
+        string AuditoriumName);
 }

@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
 using Cinema.Api.ErrorHandling;
 using Cinema.Api.OpenApi;
-using Cinema.Application;
-using Cinema.Infrastructure;
 using Cinema.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;

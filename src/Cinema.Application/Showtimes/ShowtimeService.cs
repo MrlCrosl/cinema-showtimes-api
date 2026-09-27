@@ -153,7 +153,11 @@ public sealed class ShowtimeService(
             start.AddMinutes(durationMinutes));
     }
 
-    /// <summary>Query projection (see <see cref="ShowtimeSeatRow"/> for why it is not a positional record).</summary>
+    /// <summary>
+    /// Private projection for this service. Object initializer, not a positional record: <see cref="GetAllAsync"/> and
+    /// <see cref="GetByIdAsync"/> filter and order over its members after the projection, which EF translates only for
+    /// initializer projections (see <see cref="ShowtimeSeatRow"/>).
+    /// </summary>
     private sealed class ShowtimeRow
     {
         public required Showtime Showtime { get; init; }
