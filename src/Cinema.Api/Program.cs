@@ -8,10 +8,10 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("Cinema")
-    ?? throw new InvalidOperationException("Connection string 'Cinema' is not configured.");
-
-builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddInfrastructure(serviceProvider =>
+    serviceProvider.GetRequiredService<IConfiguration>().GetConnectionString("Cinema") is { Length: > 0 } connectionString
+        ? connectionString
+        : throw new InvalidOperationException("Connection string 'Cinema' is not configured."));
 builder.Services.AddApplication();
 builder.Services.AddSingleton(TimeProvider.System);
 
@@ -47,3 +47,6 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 await app.RunAsync();
+
+/// <summary>Exposes the entry point to integration tests via WebApplicationFactory.</summary>
+public partial class Program;

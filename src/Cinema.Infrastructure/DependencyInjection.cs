@@ -7,11 +7,15 @@ namespace Cinema.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
+    /// <param name="connectionString">
+    /// Resolved when DbContext options are built (per scope), not at registration,
+    /// so hosts that finalize configuration late (e.g. WebApplicationFactory) are honoured.
+    /// </param>
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, Func<IServiceProvider, string> connectionString)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
+        ArgumentNullException.ThrowIfNull(connectionString);
 
-        services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+        services.AddDbContext<AppDbContext>((serviceProvider, options) => options.UseSqlite(connectionString(serviceProvider)));
         services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
         return services;
