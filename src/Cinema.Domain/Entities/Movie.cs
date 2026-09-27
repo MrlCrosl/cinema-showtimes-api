@@ -5,6 +5,9 @@ public sealed class Movie
     /// <summary>Year the first motion picture was made; used as a lower bound for <see cref="Year"/>.</summary>
     public const int MinYear = 1888;
 
+    /// <summary>Upper bound for <see cref="DurationMinutes"/>; also bounds the overlap search window for showtimes.</summary>
+    public const int MaxDurationMinutes = 600;
+
     private Movie()
     {
     }
@@ -25,6 +28,7 @@ public sealed class Movie
         ArgumentException.ThrowIfNullOrWhiteSpace(category);
         ArgumentOutOfRangeException.ThrowIfLessThan(year, MinYear);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(durationMinutes);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(durationMinutes, MaxDurationMinutes);
 
         return new Movie
         {

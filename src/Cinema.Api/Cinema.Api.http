@@ -1,0 +1,90 @@
+@host = http://localhost:5177
+@hall1 = 0d3a1b6e-1c4f-4a2d-9b7e-000000000001
+@inception = 6d1e2f3a-4b5c-4d6e-8f90-000000000001
+@godfather = 6d1e2f3a-4b5c-4d6e-8f90-000000000002
+
+### Movies: create (201)
+# @name createMovie
+POST {{host}}/api/movies
+Content-Type: application/json
+
+{
+  "title": "Dune: Part Two",
+  "category": "Sci-Fi",
+  "year": 2024,
+  "durationMinutes": 166
+}
+
+### Movies: create with invalid payload (400, errors per property)
+POST {{host}}/api/movies
+Content-Type: application/json
+
+{
+  "title": "",
+  "category": "Drama",
+  "year": 1800,
+  "durationMinutes": 0
+}
+
+### Movies: list (200, ordered by title)
+GET {{host}}/api/movies
+
+### Movies: get seeded movie (200)
+GET {{host}}/api/movies/{{inception}}
+
+### Movies: get created movie (200)
+GET {{host}}/api/movies/{{createMovie.response.body.$.id}}
+
+### Movies: unknown id (404)
+GET {{host}}/api/movies/00000000-0000-0000-0000-00000000dead
+
+### Showtimes: create (201; creates one ShowtimeSeat per seat in the hall)
+# @name createShowtime
+POST {{host}}/api/showtimes
+Content-Type: application/json
+
+{
+  "movieId": "{{inception}}",
+  "auditoriumId": "{{hall1}}",
+  "startTime": "2030-01-01T18:00:00Z"
+}
+
+### Showtimes: overlapping in the same auditorium (409)
+# Inception runs 148 min from 18:00, so a 19:00 start overlaps.
+POST {{host}}/api/showtimes
+Content-Type: application/json
+
+{
+  "movieId": "{{godfather}}",
+  "auditoriumId": "{{hall1}}",
+  "startTime": "2030-01-01T19:00:00Z"
+}
+
+### Showtimes: start time in the past (400)
+POST {{host}}/api/showtimes
+Content-Type: application/json
+
+{
+  "movieId": "{{inception}}",
+  "auditoriumId": "{{hall1}}",
+  "startTime": "2000-01-01T18:00:00Z"
+}
+
+### Showtimes: unknown movie (404)
+POST {{host}}/api/showtimes
+Content-Type: application/json
+
+{
+  "movieId": "00000000-0000-0000-0000-00000000dead",
+  "auditoriumId": "{{hall1}}",
+  "startTime": "2030-01-02T18:00:00Z"
+}
+
+### Showtimes: list (200, ordered by start time)
+GET {{host}}/api/showtimes
+
+### Showtimes: get created showtime (200)
+GET {{host}}/api/showtimes/{{createShowtime.response.body.$.id}}
+
+### Showtimes: unknown id (404)
+GET {{host}}/api/showtimes/00000000-0000-0000-0000-00000000dead
