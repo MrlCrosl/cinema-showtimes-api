@@ -8,6 +8,8 @@ namespace Cinema.Api.Controllers;
 [Produces("application/json")]
 public sealed class ReservationsController(IReservationService reservationService) : ControllerBase
 {
+    [EndpointSummary("Reserve specific seats")]
+    [EndpointDescription("Holds the seats for 10 minutes; confirm within that time. showtimeId comes from POST /api/showtimes or GET /api/showtimes; seatIds come from GET /api/showtimes/{id}/seats. The example seat ids are the seeded Hall 1 row 1 seats 1 and 2.")]
     [HttpPost]
     [ProducesResponseType<ReservationResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -20,6 +22,8 @@ public sealed class ReservationsController(IReservationService reservationServic
     }
 
     /// <summary>Reserves the first available block of adjacent seats in one row.</summary>
+    [EndpointSummary("Reserve a block of adjacent seats")]
+    [EndpointDescription("The system picks the first available block of count adjacent seats in one row (lowest row, leftmost). showtimeId comes from POST /api/showtimes or GET /api/showtimes. No block available returns 409.")]
     [HttpPost("contiguous")]
     [ProducesResponseType<ReservationResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -31,6 +35,8 @@ public sealed class ReservationsController(IReservationService reservationServic
         return CreatedAtAction(nameof(GetByReference), new { reference = reservation.Reference }, reservation);
     }
 
+    [EndpointSummary("Get a reservation by reference")]
+    [EndpointDescription("The reference is the value returned when the reservation was created. State is Pending, Confirmed or Expired.")]
     [HttpGet("{reference:guid}")]
     [ProducesResponseType<ReservationResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -40,6 +46,8 @@ public sealed class ReservationsController(IReservationService reservationServic
         return Ok(reservation);
     }
 
+    [EndpointSummary("Confirm a reservation")]
+    [EndpointDescription("Marks the reserved seats as sold. Fails with 409 if the reservation has expired or is already confirmed.")]
     [HttpPost("{reference:guid}/confirm")]
     [ProducesResponseType<ReservationResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

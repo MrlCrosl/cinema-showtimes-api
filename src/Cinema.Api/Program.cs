@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Cinema.Api.ErrorHandling;
+using Cinema.Api.OpenApi;
 using Cinema.Application;
 using Cinema.Infrastructure;
 using Cinema.Infrastructure.Persistence;
@@ -25,7 +26,7 @@ builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.C
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.AddOperationTransformer<RequestExamplesTransformer>());
 
 var app = builder.Build();
 

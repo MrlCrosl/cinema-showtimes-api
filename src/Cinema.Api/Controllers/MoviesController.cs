@@ -8,6 +8,7 @@ namespace Cinema.Api.Controllers;
 [Produces("application/json")]
 public sealed class MoviesController(IMovieService movieService) : ControllerBase
 {
+    [EndpointSummary("Create a movie")]
     [HttpPost]
     [ProducesResponseType<MovieResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -17,6 +18,7 @@ public sealed class MoviesController(IMovieService movieService) : ControllerBas
         return CreatedAtAction(nameof(GetById), new { id = movie.Id }, movie);
     }
 
+    [EndpointSummary("List movies, ordered by title")]
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<MovieResponse>>(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<MovieResponse>>> GetAll(CancellationToken cancellationToken)
@@ -25,6 +27,7 @@ public sealed class MoviesController(IMovieService movieService) : ControllerBas
         return Ok(movies);
     }
 
+    [EndpointSummary("Get a movie by id")]
     [HttpGet("{id:guid}")]
     [ProducesResponseType<MovieResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
