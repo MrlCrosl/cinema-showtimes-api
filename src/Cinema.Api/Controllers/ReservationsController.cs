@@ -19,6 +19,18 @@ public sealed class ReservationsController(IReservationService reservationServic
         return CreatedAtAction(nameof(GetByReference), new { reference = reservation.Reference }, reservation);
     }
 
+    /// <summary>Reserves the first available block of adjacent seats in one row.</summary>
+    [HttpPost("contiguous")]
+    [ProducesResponseType<ReservationResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<ReservationResponse>> CreateContiguous(CreateContiguousReservationRequest request, CancellationToken cancellationToken)
+    {
+        var reservation = await reservationService.ReserveContiguousAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetByReference), new { reference = reservation.Reference }, reservation);
+    }
+
     [HttpGet("{reference:guid}")]
     [ProducesResponseType<ReservationResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

@@ -180,3 +180,21 @@ GET {{host}}/api/reservations/00000000-0000-0000-0000-00000000dead
 
 ### Showtimes: seats of an unknown showtime (404)
 GET {{host}}/api/showtimes/00000000-0000-0000-0000-00000000dead/seats
+
+### Reservations: contiguous block of 3 seats picked by the system (201; row 1 seats 3-5 after the flow above)
+POST {{host}}/api/reservations/contiguous
+Content-Type: application/json
+
+{
+  "showtimeId": "{{reservationShowtime.response.body.$.id}}",
+  "count": 3
+}
+
+### Reservations: contiguous with invalid count (400)
+POST {{host}}/api/reservations/contiguous
+Content-Type: application/json
+
+{
+  "showtimeId": "{{reservationShowtime.response.body.$.id}}",
+  "count": 0
+}

@@ -2,6 +2,9 @@ namespace Cinema.Application.Reservations;
 
 public sealed record CreateReservationRequest(Guid ShowtimeId, IReadOnlyList<Guid> SeatIds);
 
+/// <summary>Asks the system to pick <see cref="Count"/> adjacent seats in one row.</summary>
+public sealed record CreateContiguousReservationRequest(Guid ShowtimeId, int Count);
+
 /// <summary>Customer-facing view of a reservation. Times are UTC.</summary>
 public sealed record ReservationResponse(
     Guid Reference,

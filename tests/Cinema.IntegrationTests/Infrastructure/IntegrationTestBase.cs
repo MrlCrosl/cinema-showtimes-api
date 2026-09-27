@@ -84,6 +84,24 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         return (await response.Content.ReadFromJsonAsync<ReservationResponse>(Json))!;
     }
 
+    protected Task<HttpResponseMessage> PostContiguousReservationAsync(Guid showtimeId, int count) =>
+        Client.PostAsJsonAsync("/api/reservations/contiguous", new CreateContiguousReservationRequest(showtimeId, count), Json);
+
+    protected async Task<ReservationResponse> ReserveContiguousAsync(Guid showtimeId, int count)
+    {
+        var response = await PostContiguousReservationAsync(showtimeId, count);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Created, await response.Content.ReadAsStringAsync());
+        return (await response.Content.ReadFromJsonAsync<ReservationResponse>(Json))!;
+    }
+
+    /// <summary>Seat ids at the given positions, looked up from the showtime's seat map.</summary>
+    protected async Task<List<Guid>> SeatIdsAtAsync(Guid showtimeId, params (int Row, int Number)[] positions)
+    {
+        var seats = await GetSeatsAsync(showtimeId);
+        return positions.Select(p => seats.Single(s => s.Row == p.Row && s.Number == p.Number).SeatId).ToList();
+    }
+
     protected Task<HttpResponseMessage> ConfirmAsync(Guid reference) =>
         Client.PostAsync($"/api/reservations/{reference}/confirm", content: null);
 

@@ -7,6 +7,11 @@ public interface IReservationService
     /// <exception cref="Cinema.Domain.Exceptions.ConflictException">The showtime has started, a seat is taken, or a concurrent request won.</exception>
     Task<ReservationResponse> ReserveAsync(CreateReservationRequest request, CancellationToken cancellationToken = default);
 
+    /// <summary>Reserves the first available block of adjacent seats in one row (first fit, lowest row, leftmost).</summary>
+    /// <exception cref="Cinema.Domain.Exceptions.NotFoundException">The showtime does not exist.</exception>
+    /// <exception cref="Cinema.Domain.Exceptions.ConflictException">The showtime has started, no block is available, or a concurrent request won.</exception>
+    Task<ReservationResponse> ReserveContiguousAsync(CreateContiguousReservationRequest request, CancellationToken cancellationToken = default);
+
     /// <exception cref="Cinema.Domain.Exceptions.NotFoundException">The reservation does not exist.</exception>
     /// <exception cref="Cinema.Domain.Exceptions.ConflictException">The reservation is expired, already confirmed, or a concurrent request won.</exception>
     Task<ReservationResponse> ConfirmAsync(Guid reference, CancellationToken cancellationToken = default);
