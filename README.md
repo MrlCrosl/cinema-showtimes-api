@@ -95,6 +95,10 @@ duration 1 to 600 minutes; showtime start must be in the future; 1 to 10 seats p
 - **FluentValidation and ProblemDetails.** Request DTOs are validated by injected validators inside the services; a
   single exception handler maps validation, not-found, conflict and unexpected errors to ProblemDetails.
 - **TimeProvider.** Every "now" comes from an injected `TimeProvider`, which is what lets the tests control expiry.
+- **Aggregates reference each other by id only.** `ShowtimeSeat` has a `ReservationId`, not a `Reservation`
+  navigation; seat holders are loaded in one batched second query (no N+1).
+- **Indexes verified with `EXPLAIN QUERY PLAN`.** Every reservation and write path is an index `SEARCH`; the showtime
+  overlap check is covered by `IX_Showtimes_AuditoriumId_StartTime` (equality on `AuditoriumId`, range on `StartTime`).
 
 ## Concurrency (US-7)
 
