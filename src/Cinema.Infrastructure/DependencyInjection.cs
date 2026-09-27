@@ -7,6 +7,7 @@ namespace Cinema.Infrastructure;
 
 public static class DependencyInjection
 {
+    /// <param name="services">The service collection to register infrastructure services in.</param>
     /// <param name="connectionString">
     /// Resolved when DbContext options are built (per scope), not at registration,
     /// so hosts that finalize configuration late (e.g. WebApplicationFactory) are honoured.

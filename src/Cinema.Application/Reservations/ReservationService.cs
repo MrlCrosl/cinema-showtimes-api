@@ -59,9 +59,7 @@ public sealed class ReservationService(
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var showtime = await LoadUpcomingShowtimeAsync(request.ShowtimeId, now, cancellationToken);
 
-        // The whole seat map is needed to find a block, so it is loaded tracked in one query. Only the chosen
-        // seats are modified, and the concurrency token is checked on modified rows only, so this stays correct;
-        // for larger halls a two-step load (untracked map, then tracked block) would trade a round trip for memory.
+        // Whole seat map is loaded tracked; only the chosen seats are modified, so the Version check still applies.
         var seats = await dbContext.ShowtimeSeats
             .Where(ss => ss.ShowtimeId == showtime.Id)
             .WithPosition(dbContext)

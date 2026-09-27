@@ -153,7 +153,7 @@ public sealed class ShowtimeService(
             start.AddMinutes(durationMinutes));
     }
 
-    /// <summary>Query projection. Uses an object initializer (not a positional ctor) so EF can compose Where/OrderBy over its members.</summary>
+    /// <summary>Query projection (see <see cref="ShowtimeSeatRow"/> for why it is not a positional record).</summary>
     private sealed class ShowtimeRow
     {
         public required Showtime Showtime { get; init; }
