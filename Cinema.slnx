@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Cinema.Api/Cinema.Api.csproj" />
+    <Project Path="src/Cinema.Application/Cinema.Application.csproj" />
+    <Project Path="src/Cinema.Domain/Cinema.Domain.csproj" />
+    <Project Path="src/Cinema.Infrastructure/Cinema.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Cinema.IntegrationTests/Cinema.IntegrationTests.csproj" />
+    <Project Path="tests/Cinema.UnitTests/Cinema.UnitTests.csproj" />
+  </Folder>
+</Solution>
