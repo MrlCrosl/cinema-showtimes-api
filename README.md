@@ -44,8 +44,7 @@ dotnet test
 Unit tests (`tests/Cinema.UnitTests`) cover the domain rules without a database: reservation expiry and confirmation,
 seat state transitions, the contiguous block finder and the request validators. Integration tests
 (`tests/Cinema.IntegrationTests`) run the real HTTP pipeline through `WebApplicationFactory`, including migrations
-and seed data, and cover expiry, error mapping, the concurrency scenarios and every endpoint except the two showtime
-reads (`GET /api/showtimes` and `GET /api/showtimes/{id}`).
+and seed data, and cover every endpoint, expiry, error mapping and the concurrency scenarios.
 
 Application services are tested through the HTTP pipeline against real SQLite rather than with a mocked DbContext,
 because the behavior that matters here (queries, the concurrency token, one SaveChanges per operation) lives in the

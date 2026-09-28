@@ -1,5 +1,6 @@
 using System.Globalization;
 using Cinema.Application.Movies;
+using Cinema.Application.Showtimes;
 using Cinema.Infrastructure.Persistence.Seed;
 using Cinema.IntegrationTests.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -131,6 +132,47 @@ public sealed class MoviesAndShowtimesTests : IntegrationTestBase
     {
         // Act
         var response = await PostShowtimeAsync(Guid.CreateVersion7(), SeedData.Hall1Id, Now.AddDays(1));
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetShowtimes_TwoShowtimes_ReturnsThemOrderedByStartTime()
+    {
+        // Arrange
+        var later = await CreateShowtimeAsync(SeedData.InceptionId, TimeSpan.FromDays(2));
+        var earlier = await CreateShowtimeAsync(SeedData.TheGodfatherId, TimeSpan.FromDays(1));
+
+        // Act
+        var response = await Client.GetAsync("/api/showtimes");
+        var showtimes = await ReadAsync<List<ShowtimeResponse>>(response);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        showtimes.ShouldBe([earlier, later]);
+    }
+
+    [Fact]
+    public async Task GetShowtimeById_ExistingShowtime_Returns200WithShowtime()
+    {
+        // Arrange
+        var created = await CreateShowtimeAsync(SeedData.InceptionId, TimeSpan.FromDays(1));
+
+        // Act
+        var response = await Client.GetAsync($"/api/showtimes/{created.Id}");
+        var fetched = await ReadAsync<ShowtimeResponse>(response);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        fetched.ShouldBe(created);
+    }
+
+    [Fact]
+    public async Task GetShowtimeById_UnknownId_Returns404()
+    {
+        // Act
+        var response = await Client.GetAsync($"/api/showtimes/{Guid.CreateVersion7()}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
