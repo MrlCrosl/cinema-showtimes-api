@@ -485,3 +485,13 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# SQLite journal (rollback mode)
+*.db-journal
+
+# dotenv variants
+.env.*
+
+# AI agent local settings (shared CLAUDE.md stays tracked)
+.claude/settings.local.json
+CLAUDE.local.md
