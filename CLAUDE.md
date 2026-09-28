@@ -49,7 +49,7 @@ Core scope: US-1..US-5. Optional: US-6 (contiguous seats), US-7 (concurrency saf
 - Work milestone by milestone. Do not implement features from later milestones.
 - Do not commit; stop after the task and summarize changes for review.
 
-## Commands (macOS, zsh)
+## Commands
 - Build: `dotnet build`
 - Test: `dotnet test`
 - Run: `dotnet run --project src/Cinema.Api`
