@@ -1,5 +1,7 @@
 # Cinema Showtimes API
 
+[![CI](https://github.com/MrlCrosl/cinema-showtimes-api/actions/workflows/ci.yml/badge.svg)](https://github.com/MrlCrosl/cinema-showtimes-api/actions/workflows/ci.yml)
+
 A REST API for a small cinema: movies, showtimes in an auditorium, seat reservations that hold seats for 10 minutes,
 and confirmation of a reservation. Built with .NET 10, ASP.NET Core controllers, EF Core and SQLite.
 
