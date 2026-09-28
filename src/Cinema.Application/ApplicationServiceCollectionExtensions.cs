@@ -11,6 +11,9 @@ public static class ApplicationServiceCollectionExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        // The API contract is English; without this, messages follow the server's UI culture.
+        ValidatorOptions.Global.LanguageManager.Enabled = false;
+
         // Error keys must match the JSON contract (title, year, durationMinutes), not the C# property names.
         ValidatorOptions.Global.PropertyNameResolver = (_, member, _) =>
             member is null ? null : JsonNamingPolicy.CamelCase.ConvertName(member.Name);

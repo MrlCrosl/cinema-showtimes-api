@@ -1,3 +1,4 @@
+using System.Globalization;
 using Cinema.Application.Movies;
 using Cinema.Infrastructure.Persistence.Seed;
 using Cinema.IntegrationTests.Infrastructure;
@@ -39,6 +40,30 @@ public sealed class MoviesAndShowtimesTests : IntegrationTestBase
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         problem.Errors.Keys.ShouldBe(["year"]);
+    }
+
+    [Fact]
+    public async Task CreateMovie_NonEnglishUICulture_Returns400WithEnglishMessage()
+    {
+        // Arrange
+        var request = new CreateMovieRequest("", "Drama", 2020, 90);
+        var originalCulture = CultureInfo.CurrentUICulture;
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("uk-UA");
+
+        try
+        {
+            // Act
+            var response = await PostMovieAsync(request);
+            var problem = await ReadAsync<ValidationProblemDetails>(response);
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            problem.Errors["title"].ShouldBe(["'Title' must not be empty."]);
+        }
+        finally
+        {
+            CultureInfo.CurrentUICulture = originalCulture;
+        }
     }
 
     [Fact]
